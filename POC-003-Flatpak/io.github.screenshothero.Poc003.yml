@@ -1,0 +1,30 @@
+app-id: io.github.screenshothero.Poc003
+
+runtime: org.freedesktop.Platform
+runtime-version: "25.08"
+
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+
+build-options:
+  append-path: /usr/lib/sdk/rust-stable/bin
+
+command: screenshot-poc
+
+finish-args:
+  - --share=network
+  - --socket=wayland
+  - --socket=fallback-x11
+
+modules:
+  - name: screenshot-poc
+    buildsystem: simple
+
+    build-commands:
+      - cargo build --release
+      - install -Dm755 target/release/screenshot-poc /app/bin/screenshot-poc
+
+    sources:
+      - type: dir
+        path: .

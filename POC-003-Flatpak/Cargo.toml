@@ -1,0 +1,8 @@
+[package]
+name = "screenshot-poc"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+ashpd = "0.12"
+tokio = { version = "1", features = ["full"] }
