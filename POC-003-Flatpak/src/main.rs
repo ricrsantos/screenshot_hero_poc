@@ -1,11 +1,10 @@
 use ashpd::desktop::screenshot::Screenshot;
-// use image::GenericImageView;
 use std::fs;
 use url::Url;
 
 #[tokio::main]
 async fn main() -> ashpd::Result<()> {
-    println!("Solicitando screenshot...");
+    println!("Requesting screenshot...");
 
     let response = Screenshot::request()
         .interactive(true)
@@ -14,23 +13,61 @@ async fn main() -> ashpd::Result<()> {
         .await?
         .response()?;
 
-    println!("URI: {}", response.uri());
+    let uri = response.uri();
+    println!("URI: {uri}");
 
-    let path = Url::parse(response.uri().as_str())
-        .unwrap()
-        .to_file_path()
-        .unwrap();
+    let path = match Url::parse(uri.as_str()) {
+        Ok(parsed_url) => match parsed_url.to_file_path() {
+            Ok(file_path) => {
+                println!("Converted filesystem path: {}", file_path.display());
+                Some(file_path)
+            }
+            Err(_) => {
+                eprintln!("Warning: could not convert URI to a filesystem path.");
+                println!("Converted filesystem path: <not available>");
+                None
+            }
+        },
+        Err(error) => {
+            eprintln!("Warning: invalid URI returned by portal: {error}");
+            println!("Converted filesystem path: <invalid URI>");
+            None
+        }
+    };
 
-    println!("Path: {}", path.display());
+    let Some(path) = path else {
+        println!("File exists: false");
+        return Ok(());
+    };
 
-    let metadata = fs::metadata(&path).unwrap();
+    let file_exists = path.exists();
+    println!("File exists: {file_exists}");
 
-    println!("Tamanho arquivo: {} bytes", metadata.len());
+    if !file_exists {
+        eprintln!(
+            "Warning: screenshot path is not accessible from current sandbox: {}",
+            path.display()
+        );
+        return Ok(());
+    }
 
-    let img = image::open(&path).unwrap();
+    match fs::metadata(&path) {
+        Ok(metadata) => println!("File size (bytes): {}", metadata.len()),
+        Err(error) => {
+            eprintln!("Warning: failed to read file metadata: {error}");
+            return Ok(());
+        }
+    }
 
-    println!("Largura: {}", img.width());
-    println!("Altura: {}", img.height());
+    match image::open(&path) {
+        Ok(img) => {
+            println!("Image width: {}", img.width());
+            println!("Image height: {}", img.height());
+        }
+        Err(error) => {
+            eprintln!("Warning: failed to open image file: {error}");
+        }
+    }
 
     Ok(())
 }

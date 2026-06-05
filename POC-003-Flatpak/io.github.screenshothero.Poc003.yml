@@ -7,9 +7,12 @@ sdk: org.freedesktop.Sdk
 command: screenshot-poc
 
 finish-args:
-  - --socket=wayland
-  - --socket=fallback-x11
   - --share=ipc
+  - --socket=session-bus
+  - --talk-name=org.freedesktop.portal.Desktop
+  - --filesystem=home
+  - --socket=x11
+  - --socket=wayland
 
 modules:
   - name: screenshot-poc
