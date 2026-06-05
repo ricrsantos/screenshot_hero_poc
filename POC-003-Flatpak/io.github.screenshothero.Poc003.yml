@@ -1,8 +1,8 @@
 app-id: io.github.screenshothero.Poc003
 
-runtime: org.freedesktop.Platform
-runtime-version: "25.08"
-sdk: org.freedesktop.Sdk
+runtime: org.gnome.Platform
+runtime-version: "50"
+sdk: org.gnome.Sdk
 
 command: screenshot-poc
 

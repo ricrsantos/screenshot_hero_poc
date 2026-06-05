@@ -5,6 +5,9 @@ edition = "2024"
 
 [dependencies]
 ashpd = "0.12"
-image = "0.25.10"
-tokio = { version = "1", features = ["full"] }
+gio = "0.20"
+glib = "0.20"
+gtk4 = "0.9"
+libadwaita = "0.7"
+tokio = { version = "1", features = ["rt", "rt-multi-thread"] }
 url = "2.5.8"
